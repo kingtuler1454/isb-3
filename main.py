@@ -325,10 +325,7 @@ class Window(QMainWindow):
         self.field_second.setFixedSize(150,20)
         self.field_third.setFixedSize(150,20)
         self.field_fourth.setFixedSize(150,20)
-
         self.label_bob.setFont(QFont('Times', 10))
-        
-
         self.label_bob.move(445, 58)
         self.button_genkey.move(445, 150) 
         self.button_encryption.move(525, 150) 
@@ -341,9 +338,7 @@ class Window(QMainWindow):
         self.button_second_field.move(600,95)
         self.button_third_field.move(600,118)
         self.button_fourth_field.move(600,141)       
-
         self.button_OK.move(520,165)
-        
         self.label_bob.adjustSize()
         self.button_genkey.adjustSize()
         self.button_encryption.adjustSize()
