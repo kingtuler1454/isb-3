@@ -1,3 +1,4 @@
+from enum import Enum
 from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator, QFont, QPixmap
 from PyQt5 import QtWidgets, QtGui, QtCore
@@ -18,6 +19,12 @@ from serialization import Serialization
 from deserialization import Deserialization
 from chipher import Chipher
 from padding import Padding
+
+
+class chose_task(Enum):
+    first_task=1
+    second_task=2
+    third_task=3
 
 
 class Window(QMainWindow):
@@ -110,7 +117,7 @@ class Window(QMainWindow):
     def button_OK_click(self) -> None:
         """Функция которая создаёт объекты из дугих классов в зависимости от выбранного задания"""
         try:
-            if self.chose_task == 1:
+            if self.chose_task ==  chose_task.first_task.value:
                 Object_genkey = Key_generation(self.bit)
                 symmetric_key = Object_genkey.generation_key_symmetric()
                 private_key = Object_genkey.generation_private_key()
@@ -119,7 +126,7 @@ class Window(QMainWindow):
                 Object_serialization.serialiaztion_public_key(self.path_field1)
                 Object_serialization.serialization_private_key(self.path_field2)
                 Object_serialization.serialization_sum_key(self.path_field3) 
-            elif self.chose_task == 2:
+            elif self.chose_task ==  chose_task.second_task.value:
                 Object_deserialization = Deserialization()
                 symmetric_key = Object_deserialization.deserialization_sym_key(
                     self.path_field3
