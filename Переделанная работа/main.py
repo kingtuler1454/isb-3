@@ -106,47 +106,21 @@ class Window(QMainWindow):
         self.button_fourth_field.adjustSize()
         self.button_OK.adjustSize()
 
-    def button_field_click1(self, number: int):
-        self.field_first.clear()
-        self.path_field1 = QFileDialog.getExistingDirectory(self, "Выбрать папку", ".")
-        self.field_first.setText(self.path_field1)
-        self.field_first.adjustSize()
-
-    def button_field_click2(self, number: int):
-        self.field_second.clear()
-        self.path_field2 = QFileDialog.getExistingDirectory(self, "Выбрать папку", ".")
-        self.field_second.setText(self.path_field2)
-        self.field_second.adjustSize()
-
-    def button_field_click3(self, number: int):
-        self.field_third.clear()
-        self.path_third = QFileDialog.getExistingDirectory(self, "Выбрать папку", ".")
-        self.field_third.setText(self.path_field3)
-        self.field_third.adjustSize()
-
-    def button_field_click4(self, number: int):
-        self.field_fourth.clear()
-        self.path_field4 = QFileDialog.getExistingDirectory(self, "Выбрать папку", ".")
-        self.field_fourth.setText(self.path_field4)
-        self.field_fourth.adjustSize()
 
     def button_OK_click(self) -> None:
         """Функция которая создаёт объекты из дугих классов в зависимости от выбранного задания"""
-        if self.chose_task == 1:
-            Object_genkey = Key_generation(self.bit)
-            symmetric_key = Object_genkey.generation_key_symmetric()
-            private_key = Object_genkey.generation_private_key()
-            public_key = Object_genkey.generation_public_key(private_key)
-            Object_serialization = Serialization(public_key, private_key, symmetric_key)
-            try:
+        try:
+            if self.chose_task == 1:
+                Object_genkey = Key_generation(self.bit)
+                symmetric_key = Object_genkey.generation_key_symmetric()
+                private_key = Object_genkey.generation_private_key()
+                public_key = Object_genkey.generation_public_key(private_key)
+                Object_serialization = Serialization(public_key, private_key, symmetric_key)
                 Object_serialization.serialiaztion_public_key(self.path_field1)
                 Object_serialization.serialization_private_key(self.path_field2)
-                Object_serialization.serialization_sum_key(self.path_field3)
-            except FileNotFoundError:
-                QMessageBox.about(self, "Внимание", "Проверьте введённые данные")
-        elif self.chose_task == 2:
-            Object_deserialization = Deserialization()
-            try:
+                Object_serialization.serialization_sum_key(self.path_field3) 
+            elif self.chose_task == 2:
+                Object_deserialization = Deserialization()
                 symmetric_key = Object_deserialization.deserialization_sym_key(
                     self.path_field3
                 )
@@ -161,23 +135,23 @@ class Window(QMainWindow):
                 Object_chipher.encrypted_text_symmetric_algorithm(
                     d_symmetric_key, padded_text, self.path_field4
                 )
-            except FileNotFoundError:
+            else:
+                Object_deserialization = Deserialization()
+                symmetric_key = Object_deserialization.deserialization_sym_key(
+                    str(self.field_third.text())
+                )
+                private_key = Object_deserialization.deserialization_private_key(
+                    str(self.field_second.text())
+                )
+                public_key = private_key.public_key()
+                Object_chipher = Chipher(public_key, symmetric_key, private_key)
+                d_symmetric_key = Object_chipher.decrypted_symmetric_key()
+                content_encrypted = Object_deserialization.deserialization_shipher_file()
+                dc_text = Object_chipher.decrypted_text()
+                Object_padding = Padding(str(self.field_first.text()), self.bit)
+                Object_padding.depadding(dc_text, str(self.field_fourth.text()))
+        except FileNotFoundError:
                 QMessageBox.about(self, "Внимание", "Проверьте введённые данные")
-        else:
-            Object_deserialization = Deserialization()
-            symmetric_key = Object_deserialization.deserialization_sym_key(
-                str(self.field_third.text())
-            )
-            private_key = Object_deserialization.deserialization_private_key(
-                str(self.field_second.text())
-            )
-            public_key = private_key.public_key()
-            Object_chipher = Chipher(public_key, symmetric_key, private_key)
-            d_symmetric_key = Object_chipher.decrypted_symmetric_key()
-            content_encrypted = Object_deserialization.deserialization_shipher_file()
-            dc_text = Object_chipher.decrypted_text()
-            Object_padding = Padding(str(self.field_first.text()), self.bit)
-            Object_padding.depadding(dc_text, str(self.field_fourth.text()))
         QMessageBox.about(self, "Внимание", "Успешно")
         self.field_first.clear()
         self.field_second.clear()
@@ -223,6 +197,15 @@ class Window(QMainWindow):
         self.field_second.setPlaceholderText("private_key_path")
         self.field_third.setPlaceholderText("symmetric_key_path")
         self.field_fourth.setPlaceholderText("decrypted_file_path")
+    
+    
+    def button_field_click(self,current_field):
+        text=QFileDialog.getExistingDirectory(self, "Выбрать папку", ".")
+        current_field.clear()
+        current_field.setText(str(text))
+        current_field.adjustSize()
+
+
 
     def __init__(self) -> None:
         """ "create a window object"""
@@ -249,10 +232,10 @@ class Window(QMainWindow):
         self.button_task1.clicked.connect(self.button_task1_click)
         self.button_task2.clicked.connect(self.button_task2_click)
         self.button_task3.clicked.connect(self.button_task3_click)
-        self.button_first_field.clicked.connect(self.button_field_click1)
-        self.button_second_field.clicked.connect(self.button_field_click2)
-        self.button_third_field.clicked.connect(self.button_field_click3)
-        self.button_fourth_field.clicked.connect(self.button_field_click4)
+        self.button_first_field.clicked.connect(lambda: self.button_field_click(self.field_first))
+        self.button_second_field.clicked.connect(lambda: self.button_field_click(self.field_second))
+        self.button_third_field.clicked.connect(lambda: self.button_field_click(self.field_third))
+        self.button_fourth_field.clicked.connect(lambda: self.button_field_click(self.field_fourth))
         self.button_OK.clicked.connect(self.button_OK_click)
         self.bit = "0"
         while self.bit != "128" and self.bit != "192" and self.bit != "256":
@@ -262,3 +245,19 @@ class Window(QMainWindow):
             if ok:
                 self.bit = text
         self.bit = int(int(text) / 8)
+
+
+def application() -> None:
+    """"Start aplication mainwindow"""
+    app = QApplication(sys.argv)
+    window = Window()
+    window.setObjectName("MainWindow")
+    window.setWindowIcon(QtGui.QIcon('phon.png'))
+    window.setMinimumSize(800,600)
+    window.setMaximumSize(800,600)
+    window.setWindowTitle("Номенклатура")
+    window.setStyleSheet("#MainWindow{border-image:url(phon.png)}")  # 3e753b
+    window.show()
+    sys.exit(app.exec_())
+if __name__ == "__main__":
+    application()
